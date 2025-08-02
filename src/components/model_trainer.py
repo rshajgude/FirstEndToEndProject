@@ -41,7 +41,44 @@ class ModelTrainer:
                 "AdaBoostRegressor":AdaBoostRegressor(),
             }
             
-            model_report:dict=evaluate_model(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, models=models)
+            params={
+                "Decision_Tree":{
+                    'criterion':['squared_error', 'friedman_mse', 'absolute_error', 'poison'],
+                    'splitter':['best', 'random'],
+                    #'max_features':['sqrt', 'log2']
+                },
+                "Random_Forest":{
+                    'n_estimators':[4, 8, 16, 32, 64, 128]
+                },
+                "Gradient_Boosting":{
+                    'learning_rate':[0.1, 0.01, 0.001, 0.0001],
+                    'subsample':[0.6, 0.7, 0.8, 0.9],
+                    'n_estimators':[4, 8, 16, 32, 64, 128]
+                },
+                "Linear_Regression": {
+                    
+                },
+                "K_Nearest_Neighbors":{
+                    'n_neighbors':[5,6,7,8,9],
+                    #
+                },
+                "XGBRegressor":{
+                    'learning_rate':[0.1, 0.01, 0.001, 0.0001],
+                    'n_estimators':[4, 8, 16, 32, 64, 128],
+                },
+                "CatBootRegressor":{
+                    'depth':[6,8,10],
+                    'learning_rate':[0.1, 0.01, 0.001, 0.0001],
+                    'iterations':[30,50, 70]
+                },
+                "AdaBoostRegressor":{
+                    'learning_rate':[0.1, 0.01, 0.001, 0.0001],
+                    'n_estimators':[4, 8, 16, 32, 64, 128],
+                }
+            }
+            
+            model_report:dict=evaluate_model(x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test, 
+                                             models=models, param=params)
             
             # get best score
             best_model_score=max(sorted(model_report.values()))
@@ -52,6 +89,7 @@ class ModelTrainer:
                                                       ]
             
             best_model=models[best_model_name]
+            logging.info(f"Best model found {best_model_name}")
             
             if best_model_score<0.6:
                 raise CustomException("no best model found")
@@ -68,3 +106,7 @@ class ModelTrainer:
         except Exception as e:
             raise CustomException(e, sys)
         
+
+if __name__=="__main__":
+    app.run(host="0.0.0.0", debug=True)
+    
